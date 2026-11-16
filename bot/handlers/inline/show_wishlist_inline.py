@@ -2,7 +2,7 @@ import html
 import random
 
 from aiogram import Router, F, types
-from aiogram.types import InlineQueryResultArticle, InputTextMessageContent
+from aiogram.types import InlineQueryResultArticle, InlineQueryResultCachedPhoto, InputTextMessageContent
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from bot import strings, urls
@@ -43,9 +43,27 @@ async def show_wishlist_inline_handler(query: types.InlineQuery, session: AsyncS
     else:
         is_owner = False
     for item in items:
+        result_id = str(query.id) + str(item.id)
+        title = item.title if not item.customer_id else "✅ " + item.title
+        markup = item_markup(
+            item=item,
+            wishlist_hashcode=wishlist.hashcode,
+            is_owner=is_owner,
+        )
+        if item.photo_file_id:
+            # Send the photo by its Telegram file_id: no external image hosting needed.
+            results.append(InlineQueryResultCachedPhoto(
+                id=result_id,
+                photo_file_id=item.photo_file_id,
+                title=title,
+                description=item.description,
+                caption=strings.item_info_text(item.title, item.description),
+                reply_markup=markup,
+            ))
+            continue
         results.append(InlineQueryResultArticle(
-            id=str(query.id) + str(item.id),
-            title=item.title if not item.customer_id else "✅ " + item.title,
+            id=result_id,
+            title=title,
             thumb_url=item.thumb_link if item.thumb_link is not None else random.choice(urls.gift_icon_links),
             description=item.description,
             input_message_content=InputTextMessageContent(
@@ -56,11 +74,7 @@ async def show_wishlist_inline_handler(query: types.InlineQuery, session: AsyncS
                 ),
                 disable_web_page_preview=False,
             ),
-            reply_markup=item_markup(
-                item=item,
-                wishlist_hashcode=wishlist.hashcode,
-                is_owner=is_owner,
-            )
+            reply_markup=markup,
         ))
 
     await query.answer(

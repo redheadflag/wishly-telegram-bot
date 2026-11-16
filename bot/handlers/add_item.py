@@ -1,4 +1,3 @@
-import io
 
 from aiogram import Router, F, types, Bot
 from aiogram.fsm.context import FSMContext
@@ -12,7 +11,6 @@ from bot.keyboards.callback_factories import ItemActionsCallback
 from bot.keyboards.default import skip_stage_keyboard
 from bot.keyboards.inline import ask_user_for_adding_item, go_to_menu_or_add_another_item
 from bot.states.add_item import AddItemStates
-from bot.utils.photo_link_telegraph import upload_photo
 
 router = Router()
 
@@ -67,18 +65,7 @@ async def add_new_item_to_wishlist_step4(message: types.Message, state: FSMConte
     photo_file_id = None
     if message.text != strings.skip_stage and message.photo:
         photo_file_id = message.photo[-1].file_id
-
-        photo_bytes = io.BytesIO()
-        await bot.download(message.photo[-1], photo_bytes)
-        photo_link = await upload_photo(photo_bytes)
-
-        thumb_bytes = io.BytesIO()
-        await bot.download(message.photo[0], thumb_bytes)
-        thumb_link = await upload_photo(thumb_bytes)
-
         await state.update_data(item_photo_file_id=photo_file_id)
-        await state.update_data(thumb_link=thumb_link)
-        await state.update_data(item_photo_link=photo_link)
     data = await state.get_data()
     title = data.get("item_title")
     description = data.get("item_description")
