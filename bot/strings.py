@@ -3,7 +3,7 @@ from datetime import datetime
 
 from aiogram.utils.markdown import hide_link
 
-from bot.config_reader import config
+from bot.bot_instance import get_wishlist_link
 from bot.db.models import Item, User, Wishlist
 
 
@@ -163,7 +163,7 @@ def you_havent_selected_any_item_in_wishlist(wishlist_title: str) -> str:
 
 def wishlist_successfully_created(wishlist: Wishlist):
     return f"Вишлист «<b>{wishlist.title}</b>» успешно создан! " \
-           f"Он доступен по ссылке:\nt.me/{config.BOT_USERNAME}?start=wl_{wishlist.hashcode}" \
+           f"Он доступен по ссылке:\n{get_wishlist_link(wishlist.hashcode)}" \
            "\n\nТеперь добавь подарки, которые ты хочешь получить, " \
            "а затем отправь эту ссылку друзьям или выложи её в свои соцсети, " \
            "чтобы все знали, что тебе подарить!"
@@ -283,7 +283,7 @@ def wishlist_detailed_information(wishlist: Wishlist, wishlist_owner: User):
         text += f" @{wishlist_owner.username}"
     text += f"\n\n<b>Чтобы показать список подарков, нажмите на кнопку ниже</b>" \
             "\nЕсли рядом с подарком стоит галочка (✅), значит эту вещь уже подарит кто-то другой"
-    text += f"\n\nСсылка на вишлист:\nt.me/{config.BOT_USERNAME}?start=wl_{wishlist.hashcode}" \
+    text += f"\n\nСсылка на вишлист:\n{get_wishlist_link(wishlist.hashcode)}" \
             f"\n(Отправьте эту ссылку друзьям или выложите в соцсети, чтобы все могли посмотреть этот вишлист)"
     return text
 
@@ -403,5 +403,5 @@ def wishlist_owner_party_soon(
     #     for i, item in enumerate(non_gifted_items):
     #         text += f'\n{i}. {item.title}'
 
-    text += f"\n\n🍀 Ссылка на ваш вишлист: t.me/{config.BOT_USERNAME}?start=wl_{wishlist.hashcode}"
+    text += f"\n\n🍀 Ссылка на ваш вишлист: {get_wishlist_link(wishlist.hashcode)}"
     return text

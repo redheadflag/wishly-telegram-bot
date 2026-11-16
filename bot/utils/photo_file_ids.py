@@ -1,4 +1,4 @@
-from bot.config_reader import config
+from bot.bot_instance import get_bot_username
 
 dev = "imba_robot"
 prod = "wishlyRobot"
@@ -16,4 +16,4 @@ pictures = {
 
 
 def get_picture_file_id(name: str) -> str:
-    return pictures[name][config.BOT_USERNAME]
+    return pictures[name][get_bot_username()]

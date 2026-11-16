@@ -1,5 +1,6 @@
 .env
 venv/
+.venv/
 .DS
 .DS_Store
 ./tests

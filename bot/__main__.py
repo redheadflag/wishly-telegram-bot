@@ -9,7 +9,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
-from bot.bot_instance import bot
+from bot.bot_instance import bot, init_bot_info
 from bot.config_reader import config, DB_URI
 from bot.handlers import add_item, main_menu, show_wishlist, edit_wishlist, gift_item, delete_item_from_wishlist, \
     my_gifts
@@ -94,10 +94,13 @@ async def main():
     dp.include_router(show_gift_ideas.router)
     dp.include_router(show_wishlist_inline.router)
 
-    # Set bot commands in UI
-    await set_ui_commands(bot)
-
     try:
+        # Resolve bot username etc. via getMe (used for deep links)
+        await init_bot_info()
+
+        # Set bot commands in UI
+        await set_ui_commands(bot)
+
         scheduler.start()
         set_scheduled_jobs_once(scheduler)
         await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
