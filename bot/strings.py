@@ -329,7 +329,7 @@ def get_inline_query_message_text(
     text_parts = list()
 
     text_parts.append(
-        f"<b>{title}</b>" + hide_link(photo_link)
+        f"<b>{title}</b>" + (hide_link(photo_link) if photo_link else "")
     )
     if description:
         text_parts.append(
